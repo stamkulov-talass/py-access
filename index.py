@@ -159,30 +159,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.pushButton.clicked.connect(self.close) 
         self.pushButton_3.clicked.connect(self.add_row)
-        
-        # 1. Создайте соединение с базой данных, вызвав метод addDatabase() класса QSqlDatabase. 
-        #    Так как вы хотите соединиться с базой данных SQLite, параметры QSQLITE передаются здесь. 
-        db = QSqlDatabase.addDatabase('QSQLITE')  
-        
-        # 2. Вызовите setDatabaseName(), чтобы установить имя базы данных, которое будет использоваться.
-        #    Вам нужно только написать путь, а имя файла заканчивается на .db 
-        #   (если база данных уже существует, используйте базу данных; если она не существует,
-        #    будет создана новая);         
-        db.setDatabaseName('book.db')                               # !!! ваша db
-        
-        # 3. Вызовите метод open(), чтобы открыть базу данных.
-        #    Если открытие прошло успешно, оно вернет True, а в случае неудачи - False. 
-        db.open()
-        
+        self.pushButton_4.clicked.connect(self.update_row)
+        self.pushButton_2.clicked.connect(self.delete_row)
 
-        # Создайте модель QSqlTableModel и вызовите setTable(), 
-        # чтобы выбрать таблицу данных для обработки.      
-        self.model = QSqlTableModel(self)
-        self.model.setTable("card")                                 # !!! тавлица в db
-        
-        # вызовите метод select(), чтобы выбрать все данные в таблице, и соответствующее
-        # представление также отобразит все данные;
-        self.model.select()
+        self.model = QtGui.QStandardItemModel(self)
+        self.methods = Student.select().fetchall()
+        for method in self.methods:
+            item = QtGui.QStandardItem(str(method))
+            item.setData(str(method))
+            self.model.appendRow(item)
         self.tableWidget.setModel(self.model)
 
 # +++ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -206,7 +191,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
         Student.insert(id, name, group, phone_number, birth_date, adress, date_of_receipt)
 # +++ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    def update_row(self):
+            inputDialog = Dialog()
+            rez = inputDialog.exec()
+            if not rez:
+                msg = QMessageBox.information(self, 'Внимание', 'Диалог сброшен.')
+                return  
+            id = inputDialog.id.text()
+            name = inputDialog.name.text()
+            group = inputDialog.group.text()
+            phone_number = inputDialog.phone_number.text()
+            birth_date = inputDialog.birth_date.text()
+            adress = inputDialog.adress.text()
+            date_of_receipt = inputDialog.date_of_receipt.text()
 
+            if not name or not id or not group or not phone_number or not birth_date or not adress or not date_of_receipt:
+                msg = QMessageBox.information(self, 'Внимание', 'Заполните пожалуйста все поля.')
+                return             
+        
+            Student.update(id, name, group, phone_number, birth_date, adress, date_of_receipt)
+
+    def delete_row(self):
+        inputDialog = Dialog()
+        rez = inputDialog.exec()
+        if not rez:
+            msg = QMessageBox.information(self, 'Внимание', 'Диалог сброшен.')
+            return  
+        id = inputDialog.id.text()
+        
+
+        if not id:
+            msg = QMessageBox.information(self, 'Внимание', 'Заполните пожалуйста все поля.')
+            return             
+    
+        Student.delete(id)
 
 if __name__ == "__main__":
     import sys
