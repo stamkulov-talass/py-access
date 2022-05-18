@@ -9,19 +9,19 @@ import db_connection
 # for row in result.fetchall():
 #     print(row)
 
-def insert(name):
-    return db_connection.execute("insert into студент(ФИО) values (?)", (name))
+def insert(id:numbers,name:string):
+    return db_connection.execute('insert into студент(ФИО,"код студент") values (?,?)', (name,id))
 
 
-def update(id: numbers, name: string):
-    result = db_connection.execute('update студент set ФИО=? where "код студент"=?', name, id)
-    db_connection.commit()
-    return result
 
+    def update(id: numbers, name: string):
+        result = db_connection.execute('update студент set ФИО=? where "код студент"=?', name, id)
+        db_connection.commit()
+        return result
 
 def select():
     return db_connection.execute('select ФИО from студент where "код студент"=65')
 
 # for row in select().fetchall():
 #     print(row)
-update(12, 'Beka')
+insert("СЕРЕГА",250)
